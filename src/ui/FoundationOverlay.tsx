@@ -10,9 +10,9 @@ export function FoundationOverlay() {
         <p>A shared starting point for a living city.</p>
       </header>
       <footer className="panel">
-        <p><strong>Physics sandbox</strong> · Drag to orbit · Scroll to zoom</p>
+        <p><strong>Gameplay sandbox</strong> · Click game, then WASD · Shift to run · Drag to look</p>
         <p>{player.name} · {player.occupation} · {player.money.toLocaleString('en-US')} game credits</p>
-        <p className="muted">Placeholder scene. Gameplay and simulation are not active yet.</p>
+        <p className="muted">Capsule controller active. City and NPCs are not implemented. Reload to reset spawn.</p>
       </footer>
     </div>
   )
