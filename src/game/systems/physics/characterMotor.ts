@@ -4,7 +4,8 @@ import type { PlanarVelocity } from '../../player/movement'
 
 /** Owns a Rapier controller; caller must dispose before its World is freed. */
 export function createCharacterMotor(world: World, body: RigidBody, collider: Collider) {
-  const controller = world.createCharacterController(0.01)
+  // A 2 cm skin keeps Rapier's ground-snap casts stable on the sandbox floor.
+  const controller = world.createCharacterController(0.02)
   controller.enableAutostep(0.3, 0.2, false)
   controller.enableSnapToGround(0.3)
   controller.setMaxSlopeClimbAngle(Math.PI / 4)
@@ -18,7 +19,9 @@ export function createCharacterMotor(world: World, body: RigidBody, collider: Co
     get grounded() { return grounded },
     step(velocity: PlanarVelocity, dt: number) {
       if (!Number.isFinite(dt) || dt <= 0) return
-      verticalVelocity = grounded ? -1 : Math.max(-50, verticalVelocity + world.gravity.y * dt)
+      // Ground contact clears vertical speed below. Apply one gravity step on the
+      // next tick; a forced -1 m/s can make Rapier ground snapping penetrate floors.
+      verticalVelocity = Math.max(-50, verticalVelocity + world.gravity.y * dt)
       displacement.x = velocity.x * dt
       displacement.y = verticalVelocity * dt
       displacement.z = velocity.z * dt

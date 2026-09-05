@@ -1,8 +1,8 @@
 # CivicMind
 
 CivicMind is a planned AI-driven 3D browser city simulation. The current app is a
-foundation sandbox: a lit ground surface, a physics cube, orbit camera and React
-overlay. The city, playable character, NPCs and AI are not implemented yet.
+gameplay sandbox: a capsule player, physics ground, third-person camera and React
+overlay. WASD movement, running and collisions work; city, NPCs and AI are future work.
 
 ## Run locally
 
@@ -14,8 +14,8 @@ npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. Drag to orbit and scroll to zoom. The cube drops
-onto the ground. This is a physics smoke scene, not a playable character.
+Open the local URL printed by Vite. Click the game, use WASD to move and Shift to
+run, and drag to orbit the follow camera. Reload to reset if you leave the ground.
 
 ```sh
 npm run typecheck

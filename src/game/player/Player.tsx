@@ -25,7 +25,7 @@ export interface PlayerSnapshot {
 }
 export interface PlayerProps {
   /** Initial spawn only. Remount with a new key for an intentional reset/teleport. */
-  player: Readonly<PlayerState>
+  player: Readonly<Pick<PlayerState, 'id' | 'position'>>
   enabled?: boolean
   character?: ReactNode
   interactables?: readonly Interactable[]

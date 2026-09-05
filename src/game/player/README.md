@@ -2,10 +2,10 @@
 
 Implemented on `codex/gameplay-foundation`, from current `origin/main`
 `0a81cc87df09737202b683f389a2b0176c1428b2`.
-This workstream exports gameplay components; Lead still mounts them in the app.
-Root PROJECT_STATUS.md remains Lead-owned and has not been changed.
+Lead has integrated Player into the existing FoundationScene Canvas/Physics.
+PROJECT_STATUS.md contains the completed integration review and verification.
 
-## Lead integration
+## Integration contract (completed in FoundationScene)
 
 1. Import `Player` from `src/game/player/Player.tsx`.
 2. Read `player` from the existing `useGameState()` provider.
@@ -14,14 +14,14 @@ Root PROJECT_STATUS.md remains Lead-owned and has not been changed.
 4. Remove sandbox OrbitControls and its import: Player owns the active camera.
 5. Remove or relocate the falling demo cube: it shares the default player spawn.
 6. Provide solid ground and simple explicit colliders for walls/curbs. Ground top
-   is Y=0. Default capsule center spawns at (0,1,0), settles near Y=0.86.
-   Reserve at least 0.31 m horizontal radius and 1.72 m vertical clearance.
+   is Y=0. Default capsule center spawns at (0,1,0), settles near Y=0.87.
+   Reserve at least 0.31 m horizontal radius and 1.74 m vertical clearance.
 7. Ensure the DOM HUD lets pointer events reach the canvas outside its controls.
    The player accepts keyboard input only while the canvas has focus.
 8. Map world entities into Interactable props and wire callbacks to UI through
    Lead-owned state. Do not write snapshots back through an invented context setter.
 9. For reset/teleport, remount Player with a new React key and the desired
-   PlayerState.position. Position prop changes alone intentionally do not teleport.
+   spawn position. Position prop changes alone intentionally do not teleport.
 10. Repeat the smoke check in the integrated city: spawn clearance, walls,
     stairs, camera obstruction, focus changes, and pause policy.
 
@@ -57,7 +57,7 @@ visual turning 14/s. Visual forward is -Z, Y up. Physics uses the world's timest
 not render-frame delta; the initial paused simulation clock does not stop motion.
 
 Capsule radius 0.3 m, cylindrical half-height 0.55 m (total height 1.7 m).
-Motor: 0.01 m skin, 0.3 m autostep, 0.2 m minimum landing width, 0.3 m ground snap,
+Motor: 0.02 m skin, 0.3 m autostep, 0.2 m minimum landing width, 0.3 m ground snap,
 45-degree climb/slide threshold, terminal falling speed 50 m/s. Gravity comes
 from world.gravity.y. Dynamic objects block movement; pushing is not enabled.
 
@@ -98,9 +98,9 @@ state. UI may store these observations; shared GameState is never mutated here.
 
 ## Verification
 
-Final checks: npm run typecheck, npm run lint, npm run test (15 tests in 4 files),
+Integration checks: npm run typecheck, npm run lint, npm run test (21 tests in 4 files),
 and npm run build all passed. Vite retains the existing large-chunk advisory.
-The build remains the Lead-owned sandbox until Player is mounted.
+The build now mounts Player in the Lead-owned sandbox.
 
 Automated: movement normalization, camera-relative vectors, walking/running,
 acceleration/stopping, smoothing at 30/120 Hz, shortest-angle rotation, nearest
@@ -122,8 +122,7 @@ Independent read-only code review found no actionable issues.
 
 ## Limitations and next work
 
-Integration into FoundationScene and PROJECT_STATUS updates remain for Lead.
-Production still displays the original sandbox until mounted. No dialogue/HUD,
+Integration into FoundationScene and PROJECT_STATUS updates are complete. No dialogue/HUD,
 simulation-clock gating, save synchronization, animation, jump, dynamic-body
 pushing, moving-platform support guarantees or out-of-world respawn.
 
@@ -139,3 +138,11 @@ colliders, then replace the placeholder with licensed idle/walk/run GLB animatio
 while keeping this collider and input contract.
 
 Reference: [Rapier character controller](https://rapier.rs/docs/user_guides/javascript/character_controller/).
+
+## Integration regression fix
+
+The original 0.01 m skin plus snap-to-ground could sink through the 12 m sandbox
+floor from spawn y=1. The motor now uses 0.02 m skin and normal gravity accumulation
+instead of forced grounded -1 m/s. Sustained idle/running tests check clearance at
+30/60/120 Hz. Player accepts only the ID and position fields it reads, so the
+read-only shared context is compatible without casting or copying inventory.
