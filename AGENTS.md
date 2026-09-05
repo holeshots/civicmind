@@ -67,3 +67,5 @@ behavior without WebGL; rendering, camera, collision and input changes also need
 browser smoke check. Report commands, results and any limits. Keep PROJECT_STATUS.md
 accurate; never claim planned features work. PRs/handoffs state exports to mount,
 shared changes, asset provenance, verification and remaining integration work.
+
+Follow [docs/BRANCHING.md](docs/BRANCHING.md): short task branches from current main, isolated worktrees, reviewed PRs with passing checks, and squash merges coordinated by Lead.

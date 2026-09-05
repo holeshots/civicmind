@@ -42,3 +42,5 @@ Vitest. No backend, AI credentials or external asset service is required.
 
 See [AGENTS.md](AGENTS.md) for contracts and integration rules, and
 [PROJECT_STATUS.md](PROJECT_STATUS.md) for handoffs and limitations.
+
+Future contributions follow [our branching strategy](docs/BRANCHING.md).

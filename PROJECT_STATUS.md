@@ -128,3 +128,7 @@ Requirements: Node 22.12+ (24 LTS recommended), npm and desktop WebGL.
    Define a typed command-submit callback with Lead before adding command behavior.
    Add input-focus, accessibility and responsive checks plus useful state/UI tests.
    Do not create another store or implement goal/economy/command simulation.
+
+## Branching strategy
+
+GitHub Flow is documented in docs/BRANCHING.md: stable main, short task branches, isolated worktrees, PR review, passing CI and squash merges. Branch protection is recommended but not configured.
