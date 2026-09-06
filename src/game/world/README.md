@@ -1,17 +1,17 @@
 # City block — Lead integration handoff
 
 Implemented on `codex/world-foundation`, from `origin/main` at
-`6aa6deb88bd29bea23c73ba5382db5fddef344ff`. Production scene mounting is left to Lead.
+`6aa6deb88bd29bea23c73ba5382db5fddef344ff`. Lead has mounted it in FoundationScene on codex/world-integration.
 
 ## Exports and mounting
 
 `CityBlock` from `src/game/world` renders one 64 × 56 m procedural neighborhood.
 It contains a fixed RigidBody with explicit cuboids; it creates no Canvas, Physics
-provider, camera, lighting, HUD or global state. `WORLD_LANDMARKS`, `CITY_BUILDINGS`
-and `WORLD_COLLIDERS` are also exported as serializable data.
+provider, camera, lighting, HUD or global state. `WORLD_LANDMARKS`, `CITY_BUILDINGS`,
+`WORLD_BOUNDS` and `WORLD_COLLIDERS` are also exported as serializable data.
 
-In the existing `FoundationScene.tsx`, replace the 12 × 12 sandbox floor with
-`<CityBlock />`, and mount `<NPCPopulation />` beside the existing `<Player />`
+The integrated `FoundationScene.tsx` replaces the 12 × 12 sandbox floor with
+`<CityBlock />`, and mounts `<NPCPopulation initialNPCs={npcs} />` beside the existing `<Player />`
 inside the existing Physics provider. Retain the existing Suspense boundary.
 Do not retain the sandbox floor: its coplanar top would overlap this ground.
 
@@ -21,17 +21,16 @@ import { NPCPopulation } from '../npc'
 
 // Within Lead's existing Physics tree:
 <CityBlock />
-<NPCPopulation />
+<NPCPopulation initialNPCs={npcs} />
 <Player player={player} />
 ```
 
 The current player spawn `(0, 1, 0)` is supported. Keep Player's camera; no
 OrbitControls should be added to the integrated scene. World materials accept the
-existing lights. For neighborhood-wide shadows, Lead should expand the directional
+existing lights. For neighborhood-wide shadows, Lead expanded the directional
 light shadow camera to approximately ±40 m and position the light around
 `(-20, 35, 20)`. QA used ambient intensity 1.2, directional intensity 2.5,
-2048 shadow maps, near 0.05, far 200 and DPR capped at 1.5. These are demo lighting
-settings, not a shared configuration change made by this branch.
+2048 shadow maps, near 0.05, far 200 and DPR capped at 1.5. These demo settings are now applied in Lead-owned scene composition.
 
 ## Coordinates
 
@@ -77,6 +76,4 @@ All geometry and signage were authored procedurally for this repository. No exte
 images, fonts, GLB files or copyrighted commercial assets were imported. No asset
 downloads or new package/lockfile changes; public/assets remains unchanged.
 
-See PROJECT_STATUS.md for verification. Next task: Lead mounts the exports, wires
-read-only nearby observations with an agreed provider API, and validates the integrated
-camera/light settings. Then add Brew & Bite's doorway/interior transition deliberately.
+See PROJECT_STATUS.md for verification and docs/UI_QA_HANDOFF.md for the next workstream. Building interiors remain future work.

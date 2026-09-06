@@ -1,17 +1,17 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { WORLD_COLLIDERS, WORLD_LANDMARKS } from './cityBlockData'
+import { WORLD_BOUNDS, WORLD_COLLIDERS, WORLD_LANDMARKS } from './cityBlockData'
 import { createCharacterMotor } from '../systems/physics/characterMotor'
 
 beforeAll(async () => { await RAPIER.init() })
 
-function fixture() {
+function fixture(x = 0, z = 0) {
   const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 })
   world.timestep = 1 / 60
   for (const box of WORLD_COLLIDERS) {
     world.createCollider(RAPIER.ColliderDesc.cuboid(...box.halfExtents).setTranslation(...box.position))
   }
-  const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, 1, 0))
+  const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(x, 1.2, z))
   const collider = world.createCollider(RAPIER.ColliderDesc.capsule(0.55, 0.3), body)
   const motor = createCharacterMotor(world, body, collider)
   world.step()
@@ -22,6 +22,36 @@ function fixture() {
 }
 
 describe('city block collision contract', () => {
+  it.each([
+    ['east', 0, 0, 6, 0, 'x', 31.28],
+    ['west', 0, 0, -6, 0, 'x', -31.28],
+    ['north', -29, 0, 0, -6, 'z', -27.28],
+    ['south', -29, 0, 0, 6, 'z', 27.28],
+  ] as const)('blocks the %s perimeter', (_, x, z, vx, vz, axis, edge) => {
+    const f = fixture(x, z)
+    try {
+      f.tick()
+      f.tick(vx, vz, 600)
+      expect(f.body.translation()[axis]).toBeCloseTo(edge, 1)
+      expect(f.motor.grounded).toBe(true)
+    } finally { f.motor.dispose(); f.world.free() }
+  })
+
+  it.each(WORLD_LANDMARKS)('blocks the closed $name facade', landmark => {
+    const { x, z } = landmark.entrance
+    const f = fixture(x, z)
+    try {
+      f.tick()
+      const direction = Math.sign(z)
+      f.tick(0, direction * 3, 180)
+      expect(f.body.translation().z).toBeCloseTo(direction * 9.68, 1)
+      expect(f.body.translation().y).toBeCloseTo(1.02, 1)
+    } finally { f.motor.dispose(); f.world.free() }
+  })
+
+  it('exports the ground footprint for map consumers', () => {
+    expect(WORLD_BOUNDS).toEqual({ minX: -32, maxX: 32, minZ: -28, maxZ: 28 })
+  })
   it('supports the existing spawn at floor y=0', () => {
     const f = fixture()
     try {

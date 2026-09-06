@@ -68,3 +68,12 @@ export const WORLD_COLLIDERS: readonly WorldBox[] = [
   { id: 'north-boundary', kind: 'boundary', position: [0, 1, -27.8], halfExtents: [32, 1, 0.2] },
   { id: 'south-boundary', kind: 'boundary', position: [0, 1, 27.8], halfExtents: [32, 1, 0.2] },
 ]
+
+/** Ground footprint in meters (XZ); perimeter walls occupy the outer 0.4 m. */
+const ground = WORLD_COLLIDERS.find(box => box.kind === 'ground')!
+export const WORLD_BOUNDS = Object.freeze({
+  minX: ground.position[0] - ground.halfExtents[0],
+  maxX: ground.position[0] + ground.halfExtents[0],
+  minZ: ground.position[2] - ground.halfExtents[2],
+  maxZ: ground.position[2] + ground.halfExtents[2],
+})

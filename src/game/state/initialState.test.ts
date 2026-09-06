@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { createInitialGameState } from './initialState'
 
 describe('new game', () => {
+  it('seeds independent named NPCs for the shared provider and scene', () => {
+    const first = createInitialGameState(), second = createInitialGameState()
+    expect(first.npcs.map(npc => npc.name)).toEqual(['Maria', 'Marco', 'Samantha', 'Officer Reyes', 'Tito Ramon'])
+    first.npcs[0]!.position.x = 999
+    expect(second.npcs[0]!.position.x).toBe(-20)
+  })
   it('starts Jed unemployed with the agreed money and ownership goal', () => {
     const state = createInitialGameState()
     expect(state.player).toMatchObject({ name: 'Jed', occupation: 'Unemployed', money: 4200 })

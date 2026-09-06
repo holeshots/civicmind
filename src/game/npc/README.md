@@ -36,9 +36,8 @@ duplicate, non-finite or off-route spawns throw a descriptive error instead of s
 pedestrians through buildings. This is a spawn API, not a save/resume format.
 Changing initialNPCs does not teleport actors: remount with a new React key to reset.
 
-No competing store or provider API is introduced. Lead can seed `GameState.npcs` with
-`createInitialNPCs()` in a deliberate shared-state integration, then pass those records
-as initialNPCs. Do not pass the current empty GameState.npcs and expect defaults.
+No competing store is introduced. Lead now seeds `GameState.npcs` with
+`createInitialNPCs()` and passes those records as initialNPCs in FoundationScene.
 
 Movement runs in **real sandbox seconds**, independently of the initially paused
 GameTime, matching the existing player sandbox. Pass `enabled={false}` to freeze it;
@@ -66,5 +65,4 @@ All character geometry is authored in code; no external assets or licenses neede
 `npcSimulation.test.ts` covers state isolation, shared read-only compatibility,
 transitions, elapsed-time invariance, invalid input, route safety and nearby queries.
 
-Recommended next NPC task: agree snapshot synchronization with Lead/UI, then add
-stable interaction targets and contextual dialogue entry points without an AI service.
+FoundationScene exposes onNPCSnapshot and onPlayerSnapshot for the next UI workstream. See docs/UI_QA_HANDOFF.md for exact observation and nearby contracts. No dialogue or UI implementation is included.
