@@ -6,7 +6,8 @@ CivicMind
 
 ## Current Phase
 
-Phase 1 — Browser Game Foundation; Gameplay + Physics integrated
+Phase 1 — Browser Game Foundation; Gameplay + Physics integrated;
+World + NPCs implemented on its workstream branch, awaiting Lead mounting
 
 ## Architecture
 
@@ -37,6 +38,40 @@ still paused at day 1, 08:00; the gameplay sandbox runs independently of that cl
 headless tests import it. It matches and deduplicates the runtime used by
 @react-three/rapier 2.2.0. Update these together during dependency maintenance.
 
+## World + NPCs handoff — 2026-09-06
+
+Branch: `codex/world-foundation`, based on fetched `origin/main` at
+`6aa6deb88bd29bea23c73ba5382db5fddef344ff`. World/NPC components are implemented
+and verified in isolation, **not mounted in the production scene**. Architecture
+descriptions below referring to the sandbox remain accurate for the current app.
+
+- CityBlock: 64 × 56 m procedural neighborhood, Brew & Bite, Corner Mart,
+  Parkside Apartments, two surrounding buildings, road/crosswalks, raised sidewalks,
+  plaza, trees, benches, streetlights and visible perimeter walls.
+- Explicit simple static colliders, reused as data in actual Rapier player-motor tests.
+- NPCPopulation: Maria, Marco, Samantha, Officer Reyes and Tito Ramon; distinct
+  placeholder humanoids, deterministic sidewalk/plaza loops and 2–4 second idle stops.
+- Shared NPCState reused. Pure initialization/navigation/nearby queries, deeply
+  read-only seed compatibility, local runtime transforms, optional detached 5 Hz
+  observations, no provider changes or global store. Default movement follows real
+  sandbox time; enabled=false freezes NPC motion independently of the game clock.
+- Exports and integration instructions: [World handoff](src/game/world/README.md)
+  and [NPC handoff](src/game/npc/README.md). No external assets or dependencies added.
+
+Browser smoke used a temporary isolated scene with existing Player and a single
+Canvas/Physics. All five NPCs walked; upper-window/sign overlap was identified and
+fixed. Foreground in-app browser sampled about 179–180 fps, with 75 draw calls and
+14,766 triangles in the initial overview on this machine (not a cross-device benchmark).
+Chrome automation sampled about 1 fps; foreground verification was done in-app.
+Player rested at y=0.8701, crossed the 0.15 m curb, and stopped at the restaurant
+wall at approximately (-14.013, 1.0200, -9.6800). Fresh-load checks had no browser
+console errors. Editing the throwaway entry during QA produced createRoot/HMR errors;
+they cleared on full reload and the entry was removed. Existing Three/Rapier
+deprecation warnings remain nonblocking.
+Temporary smoke scene, diagnostics, build config and output were removed after QA.
+The mounted smoke bundle also built successfully, independently of the unmounted
+production exports. No visual evidence relies on changing the production composition.
+
 ## Completed
 
 - Browser foundation, shared types/state, toolchain, CI and agent ownership guides.
@@ -57,7 +92,7 @@ headless tests import it. It matches and deduplicates the runtime used by
 
 - Lead / Integration: gameplay review, fixes and integration completed.
 - Gameplay + Physics: initial workstream completed and mounted in the application.
-- World + NPCs: not started; no implementation was added during integration.
+- World + NPCs: implementation and isolated QA complete; awaiting Lead integration.
 - UI + QA: pending; the temporary foundation overlay only documents active controls.
 
 ## Agent Ownership
@@ -69,9 +104,12 @@ headless tests import it. It matches and deduplicates the runtime used by
 | World + NPCs | src/game/world/, src/game/npc/, public/assets/ |
 | UI + QA | src/ui/, src/components/, testing expansion coordinated with affected owner |
 
-Gameplay changes respected its folders. Lead made the necessary composition,
-dependency and overlay integration edits. World/NPC folders, shared types and
-shared state implementations were not changed. See AGENTS.md and docs/BRANCHING.md.
+Gameplay changes respected its folders. Lead made the earlier composition,
+dependency and overlay integration edits. World work is confined to world/npc code
+and related tests, with this required status update and design/handoff docs as
+cross-owner documentation edits. Shared types, state, player, UI, dependencies and
+production rendering composition remain unchanged in the world workstream.
+See AGENTS.md and docs/BRANCHING.md.
 
 ## Development Commands
 
@@ -102,17 +140,37 @@ Node 22.12+ (24 LTS recommended), npm and a modern desktop WebGL browser require
 - Source inspection confirms one Canvas/Physics provider and no per-frame React
   state updates. CI must pass on the final PR revision before integration to main.
 
+## Verification — World + NPCs, 2026-09-06
+
+- `npm ci`: clean reproducible installation; baseline 21 tests passed.
+- Final after cleanup: `npm run typecheck` PASS, `npm run lint` PASS,
+  `npm run test` PASS (36 tests, six files), `npm run build` PASS,
+  `git diff --check` PASS. Vite's existing large-chunk advisory remains.
+- New domain tests cover independent initialization, deep read-only provider inputs,
+  walking/idle/arrival transitions, frame-rate invariance, invalid elapsed input,
+  duplicate/unknown IDs, horizontal proximity, and five minutes of route clearance.
+- New real Rapier tests cover original spawn support, curb stepping, restaurant
+  blocking, perimeter containment and unobstructed landmark approaches.
+- Independent code review found no actionable implementation issue. Browser smoke
+  evidence and the limits of production integration are recorded above.
+
 ## Known Limitations
 
-- No city, NPCs, backend, AI, economy, goal evaluation, clock ticking, save system,
-  animation, jumping, finished HUD or command execution yet.
+- City/NPC exports await mounting; the default app still displays the gameplay sandbox.
+  No backend, AI, economy, goal evaluation, clock ticking, save system, player character
+  animation, jumping, finished HUD or command execution yet. NPC gait is a placeholder.
 - Finite sandbox ground has no out-of-world recovery; reload to reset if you walk
-  off the edge. World spawn/terrain and recovery policy need later coordination.
+  off the edge. CityBlock supplies perimeter walls once mounted; recovery policy still
+  needs Lead coordination for future teleports or imported terrain.
 - Camera obstruction is basic; tight spaces/slopes/moving platforms need additional
   QA against future world geometry. Interaction selection is proximity-only, with
   no line-of-sight, facing, permission or dialogue system.
 - No per-frame shared state writes; GameState.player.position remains the initial
   spawn until an explicit observation/simulation synchronization policy is added.
+- GameState.npcs remains empty until Lead seeds it. NPCPopulation defaults to five
+  local runtime records and emits optional detached observations; no shared mutations.
+  NPCs are non-blocking placeholders without avoidance/dialogue. Building doors and
+  interiors are closed; decorative detail has no mesh-level collision.
 - The lazy 3D bundle remains about 3.16 MB minified / 1.09 MB gzip. Vite's existing
   size advisory is not suppressed. Upstream Three.Clock/Rapier init deprecations
   remain nonblocking. No external 3D assets have been imported or validated.
@@ -123,7 +181,8 @@ Node 22.12+ (24 LTS recommended), npm and a modern desktop WebGL browser require
 - Gameplay: when world work is authorized, validate spawn, colliders, slopes and
   camera clearance against its geometry; agree recovery and pause policies with
   Lead. Future character animation must preserve the collider/input contracts.
-- World + NPCs: await authorization. The planned handoff is CityBlock with roads,
-  sidewalks and Brew & Bite/store/apartment shells, followed by five NPC placeholders.
+- World + NPCs: Lead should replace the sandbox floor with CityBlock and mount
+  NPCPopulation, agree nearby snapshot synchronization, and tune world-scale lighting.
+  Next world task: Brew & Bite doorway/interior transition and deliberate collider update.
 - UI + QA: build state-driven HUD panels and coordinate optional PlayerSnapshot,
   interaction callback and input-focus wiring with Lead. Do not invent a new store.
