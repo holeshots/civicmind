@@ -25,7 +25,7 @@ import { NPCPopulation } from '../npc'
 <Player player={player} />
 ```
 
-The current player spawn `(0, 1, 0)` is supported. Keep Player's camera; no
+The integrated player starts at `(0, 1.2, 7)` and settles near y=1.02 on the sidewalk. Keep Player's camera; no
 OrbitControls should be added to the integrated scene. World materials accept the
 existing lights. For neighborhood-wide shadows, Lead expanded the directional
 light shadow camera to approximately ±40 m and position the light around
