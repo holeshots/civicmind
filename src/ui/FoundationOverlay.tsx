@@ -12,7 +12,7 @@ export function FoundationOverlay() {
       <footer className="panel">
         <p><strong>Gameplay sandbox</strong> · Click game, then WASD · Shift to run · Drag to look</p>
         <p>{player.name} · {player.occupation} · {player.money.toLocaleString('en-US')} game credits</p>
-        <p className="muted">Capsule controller active. City and NPCs are not implemented. Reload to reset spawn.</p>
+        <p className="muted">City block and five pedestrians active. Building interiors are closed. Reload to reset.</p>
       </footer>
     </div>
   )

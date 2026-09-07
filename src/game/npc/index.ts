@@ -1,0 +1,5 @@
+export { NPCPopulation } from './NPCPopulation'
+export type { NPCPopulationProps } from './NPCPopulation'
+export { createInitialNPCs, NPC_DEFINITIONS } from './npcData'
+export { createNPCSimulation, advanceNPC, getNearbyNPCs } from './npcSimulation'
+export type { NPCRuntime, NPCSeed } from './npcSimulation'
