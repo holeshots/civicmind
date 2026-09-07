@@ -3,7 +3,31 @@
 ## Current Phase
 
 Phase 1 browser foundation. Gameplay + Physics — completed/integrated.
-World + NPCs — completed/integrated. UI + QA — pending; no HUD workstream implemented.
+World + NPCs — completed/integrated. UI + QA — implemented on codex/ui-foundation,
+ready for Lead review/integration; not yet merged to main.
+
+## UI + QA foundation — 2026-09-07
+
+The temporary overlay is replaced by a responsive DOM HUD: shared player stats and
+peso wallet, current goal with clearly labeled suggested steps, paused day/time,
+local command/activity log, seven working navigation dialogs, a live schematic
+minimap and nearby people. Backquote opens separate developer diagnostics. Session
+settings control density, objectives and minimap. No AI execution or demo events.
+
+App connects the existing player/NPC observation callbacks through useHUDSession.
+The scene is memoized and the callback identities stay stable. No shared-state or
+type changes, new dependencies, Canvas, physics/world/NPC edits or assets. Local
+command events are capped at 100 and disappear on reload; shared activity stays
+read-only. See [UI handoff](docs/UI_FOUNDATION_HANDOFF.md) for exports, integration,
+QA evidence and limitations.
+
+Verification: npm ci, typecheck, lint, 65 tests across eight files (20 new), build,
+and git diff --check pass. The existing large scene-chunk advisory remains.
+Independent source review found command truncation and a spurious map road; both
+were corrected and re-reviewed without remaining blockers. Browser checks covered
+scene/HUD rendering, all seven dialogs, Escape/focus return, local submission and
+501-character rejection, settings, debug and typing isolation, and desktop/narrow
+layouts. See the handoff for the exact scope and remaining browser limits.
 
 ## Architecture and review
 
@@ -79,9 +103,10 @@ and [NPC API](src/game/npc/README.md).
 
 ## Limitations and next workstream
 
-- UI + QA is next, not started. Existing overlay is temporary. GameState positions
-  are initial seeds; live callbacks require explicit App wiring. Activity is empty;
-  no event writer, goal completion, economy, clock ticking or command execution.
+- On this branch UI + QA is ready for Lead review. GameState positions remain
+  initial seeds; the HUD consumes detached live observations through App wiring.
+  Shared activity is empty; the HUD has a bounded local session event writer.
+  No domain event action, goal completion, economy, clock ticking or command execution.
 - Game time stays paused at day 1 08:00; Player and NPC sandbox motion uses real time.
   Jed remains unemployed with 4,200 whole credits; ownership goal is data only.
 - NPCs are non-blocking visual placeholders with no avoidance, dialogue, schedules,

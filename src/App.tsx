@@ -1,19 +1,22 @@
-import { lazy, Suspense } from 'react'
+import { lazy, memo, Suspense } from 'react'
 import { GameProvider } from './game/state/GameProvider'
-import { FoundationOverlay } from './ui/FoundationOverlay'
+import { GameHUD, useHUDSession } from './ui'
 import { SceneBoundary } from './SceneBoundary'
 
-const FoundationScene = lazy(() => import('./game/rendering/FoundationScene'))
+const FoundationScene = memo(lazy(() => import('./game/rendering/FoundationScene')))
 
 export default function App() {
-  return <GameProvider>
-    <main className="app" aria-label="CivicMind foundation sandbox">
+  return <GameProvider><GameView /></GameProvider>
+}
+
+function GameView() {
+  const session = useHUDSession()
+  return <main className="app" aria-label="CivicMind game">
       <SceneBoundary>
         <Suspense fallback={<p className="scene-message" role="status">Loading 3D scene…</p>}>
-          <FoundationScene />
+          <FoundationScene onPlayerSnapshot={session.onPlayerSnapshot} onNPCSnapshot={session.onNPCSnapshot} />
         </Suspense>
       </SceneBoundary>
-      <FoundationOverlay />
+      <GameHUD {...session} />
     </main>
-  </GameProvider>
 }

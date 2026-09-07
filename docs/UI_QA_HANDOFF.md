@@ -1,5 +1,8 @@
 # UI + QA handoff
 
+This document records the pre-UI integration baseline. For the implemented HUD,
+App wiring and current QA evidence, see [UI foundation handoff](UI_FOUNDATION_HANDOFF.md).
+
 World + NPCs and Gameplay + Physics are integrated. This document prepares the next
 workstream; it does not authorize or implement UI features. Start a fresh scoped
 branch/worktree from fetched origin/main and follow AGENTS.md and docs/BRANCHING.md.
