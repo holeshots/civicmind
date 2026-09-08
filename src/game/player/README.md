@@ -14,7 +14,7 @@ PROJECT_STATUS.md contains the completed integration review and verification.
 4. Remove sandbox OrbitControls and its import: Player owns the active camera.
 5. Remove or relocate the falling demo cube: it shares the default player spawn.
 6. Provide solid ground and simple explicit colliders for walls/curbs. Ground top
-   is Y=0. Default capsule center spawns at (0,1,0), settles near Y=0.87.
+   is Y=0. Shared initial capsule center is (0,1.2,7), settling near Y=1.02 on the sidewalk.
    Reserve at least 0.31 m horizontal radius and 1.74 m vertical clearance.
 7. Ensure the DOM HUD lets pointer events reach the canvas outside its controls.
    The player accepts keyboard input only while the canvas has focus.

@@ -2,7 +2,8 @@
 
 CivicMind is a planned AI-driven 3D browser city simulation. The current app is a
 walkable city block with a capsule player, third-person camera and five moving NPCs.
-WASD movement, running and collisions work. AI and the finished HUD are future work.
+Phase 1 is complete: movement, collision, HUD, live minimap/nearby people, goals,
+local command log and seven navigation dialogs work. AI and economy are future work.
 
 ## Run locally
 
@@ -15,7 +16,9 @@ npm run dev
 ```
 
 Open the local URL printed by Vite. Click the game, use WASD to move and Shift to
-run, and drag to orbit the follow camera. Buildings are closed; reload to reset.
+run, and drag to orbit the follow camera. UI focus releases held movement. Backquote
+toggles diagnostics; Escape closes dialogs. Commands are recorded only, with no AI
+action. Buildings are closed; reload resets commands and preferences.
 
 ```sh
 npm run typecheck

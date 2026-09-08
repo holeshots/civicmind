@@ -6,7 +6,7 @@ export function createInitialGameState(): GameState {
   return {
     player: {
       id: 'player-jed', name: 'Jed', occupation: 'Unemployed', money: 4200,
-      position: { x: 0, y: 1, z: 0 },
+      position: { x: 0, y: 1.2, z: 7 },
       stats: { health: 100, energy: 100, hunger: 0, reputation: 0 },
       inventory: [],
     },

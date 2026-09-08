@@ -2,16 +2,17 @@ import RAPIER from '@dimforge/rapier3d-compat'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { WORLD_BOUNDS, WORLD_COLLIDERS, WORLD_LANDMARKS } from './cityBlockData'
 import { createCharacterMotor } from '../systems/physics/characterMotor'
+import { createInitialGameState } from '../state/initialState'
 
 beforeAll(async () => { await RAPIER.init() })
 
-function fixture(x = 0, z = 0) {
+function fixture(x = 0, z = 0, y = 1.2) {
   const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 })
   world.timestep = 1 / 60
   for (const box of WORLD_COLLIDERS) {
     world.createCollider(RAPIER.ColliderDesc.cuboid(...box.halfExtents).setTranslation(...box.position))
   }
-  const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(x, 1.2, z))
+  const body = world.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(x, y, z))
   const collider = world.createCollider(RAPIER.ColliderDesc.capsule(0.55, 0.3), body)
   const motor = createCharacterMotor(world, body, collider)
   world.step()
@@ -22,6 +23,17 @@ function fixture(x = 0, z = 0) {
 }
 
 describe('city block collision contract', () => {
+  it('starts the actual shared player safely on a pedestrian surface', () => {
+    const { x, y, z } = createInitialGameState().player.position
+    const f = fixture(x, z, y)
+    try {
+      f.tick(0, 0, 600)
+      expect(f.body.translation().y).toBeCloseTo(1.02, 2)
+      expect(f.motor.grounded).toBe(true)
+      expect(f.body.translation().x).toBeCloseTo(x, 2)
+      expect(f.body.translation().z).toBeCloseTo(z, 2)
+    } finally { f.motor.dispose(); f.world.free() }
+  })
   it.each([
     ['east', 0, 0, 6, 0, 'x', 31.28],
     ['west', 0, 0, -6, 0, 'x', -31.28],
